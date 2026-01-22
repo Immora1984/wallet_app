@@ -67,9 +67,9 @@ public class WalletControllerTest {
             authorities = {"USER"}
     )
     void successfulAction() throws Exception {
-        Mockito.when(this.walletRepository.findById((UUID)Mockito.any(UUID.class))).thenReturn(Optional.of(WalletUtils.generateWallet()));
+        Mockito.when(this.walletRepository.findById(Mockito.any(UUID.class))).thenReturn(Optional.of(WalletUtils.generateWallet()));
         Mockito.when(walletRepository.save(Mockito.any(Wallet.class))).thenReturn(WalletUtils.generateWallet());
-        this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/wallet", new Object[0]).with(SecurityMockMvcRequestPostProcessors.csrf()).content(WalletUtils.getActionRequestBody()).contentType(MediaType.APPLICATION_JSON)).andExpect(MockMvcResultMatchers.status().isOk());
+        this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/wallet").with(SecurityMockMvcRequestPostProcessors.csrf()).content(WalletUtils.getActionRequestBody()).contentType(MediaType.APPLICATION_JSON)).andExpect(MockMvcResultMatchers.status().isOk());
     }
 
     @Test
