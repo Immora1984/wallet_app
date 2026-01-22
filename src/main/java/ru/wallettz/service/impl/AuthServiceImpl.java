@@ -1,0 +1,177 @@
+package ru.wallettz.service.impl;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSSigner;
+import com.nimbusds.jose.crypto.RSASSAVerifier;
+import com.nimbusds.jwt.SignedJWT;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.text.ParseException;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Date;
+import java.util.Objects;
+import java.util.function.Consumer;
+import lombok.Generated;
+import lombok.extern.slf4j.Slf4j;
+import lombok.extern.slf4j.XSlf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ru.wallettz.dto.AuthTokenResponse;
+import ru.wallettz.entity.Auth;
+import ru.wallettz.entity.User;
+import ru.wallettz.repository.AuthRepository;
+import ru.wallettz.service.AuthService;
+import ru.wallettz.util.AuthMappers;
+
+@Slf4j
+@Service
+@Transactional
+public class AuthServiceImpl implements AuthService {
+    private final RSASSAVerifier rsassaVerifier;
+    private final AuthRepository authRepository;
+    private final ObjectMapper objectMapper;
+    private final AuthMappers authMapper;
+    private final JWSSigner jwssigner;
+    @Value("${spring.security.jwt.expires}")
+    private Duration expires;
+
+    public void jwtFilter(HttpServletRequest rq, HttpServletResponse rp, FilterChain chain) throws ServletException, IOException {
+        this.authorizationBearer(rq, (accessToken) -> {
+            var auth = createAuthentication(accessToken);
+            SecurityContextHolder.getContext().setAuthentication(auth);
+        });
+        chain.doFilter(rq, rp);
+    }
+
+    public void jwtFilter(ServletRequest rq, ServletResponse rp, FilterChain chain) throws ServletException, IOException {
+        jwtFilter((HttpServletRequest)rq, (HttpServletResponse)rp, chain);
+    }
+
+    public void authenticate(HttpServletRequest rq, HttpServletResponse rp, Authentication auth) {
+        if (auth instanceof UsernamePasswordAuthenticationToken token) {
+            authenticateUsernamePasswordToken(rq, rp, token);
+        }
+
+    }
+
+    public void failure(HttpServletRequest rq, HttpServletResponse rp, RuntimeException except) {
+        failureHandle(rp, except);
+    }
+
+    public void logout(HttpServletRequest rq, HttpServletResponse rp, Authentication authentication) {
+        authorizationBearer(rq, (accessToken) -> {
+            var jti = (String)createAuthentication(accessToken).getCredentials();
+            authRepository.removeByJti(jti);
+        });
+    }
+
+    void authenticateUsernamePasswordToken(HttpServletRequest rq, HttpServletResponse rp, UsernamePasswordAuthenticationToken token) {
+        User user = (User)token.getPrincipal();
+        if (!user.isEnabled()) {
+            throw new DisabledException("Пользователь деактивирован");
+        } else {
+            authenticateUser(rp, user);
+        }
+    }
+
+    void authenticateUser(HttpServletResponse rp, User user) {
+        this.authenticate(rp, authMapper.fromUser(user));
+    }
+
+    void authenticate(HttpServletResponse rp, Auth auth) {
+        this.successHandle(rp, authRepository.save(auth));
+    }
+
+    void failureHandle(HttpServletResponse rp, RuntimeException except) {
+        this.handle(rp, ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, except.getLocalizedMessage()));
+    }
+
+    void successHandle(HttpServletResponse rp, Auth auth) {
+        this.handle(rp, this.createToken(auth));
+    }
+
+    void handle(HttpServletResponse rp, Object payload) {
+        rp.setContentType("application/json;charset=UTF-8");
+        if (payload instanceof ProblemDetail pd) {
+            rp.setStatus(pd.getStatus());
+        }
+
+        try {
+            try (ServletOutputStream sos = rp.getOutputStream()) {
+                sos.write(this.objectMapper.writeValueAsBytes(payload));
+            }
+
+        } catch (IOException e) {
+            throw new AccessDeniedException(e.getLocalizedMessage());
+        }
+    }
+
+    Authentication createAuthentication(String bearerToken) {
+        var var10000 = this.authMapper;
+        AuthRepository var10001 = this.authRepository;
+        Objects.requireNonNull(var10001);
+        return var10000.toAuthentication(var10001::findByJtiAndUserId, () -> {
+            try {
+                SignedJWT signed = SignedJWT.parse(bearerToken);
+                if (!signed.verify(this.rsassaVerifier)) {
+                    throw new BadCredentialsException("Ошибка авторизации");
+                } else {
+                    return signed.getJWTClaimsSet();
+                }
+            } catch (ParseException | JOSEException var3) {
+                throw new BadCredentialsException("Ошибка авторизации");
+            }
+        });
+    }
+
+    AuthTokenResponse createToken(Auth auth) {
+        Date current = new Date(Instant.now().plus(this.expires).toEpochMilli());
+        return this.authMapper.toAuthToken(auth, current.getTime(), () -> {
+            SignedJWT jwt = this.authMapper.toSignedJWT(auth, current);
+
+            try {
+                jwt.sign(this.jwssigner);
+            } catch (JOSEException e) {
+                throw new AccessDeniedException("Ошибка при создании сессии", e);
+            }
+
+            return jwt.serialize();
+        });
+    }
+
+    void authorizationBearer(HttpServletRequest rq, Consumer<String> consumer) {
+        String header = rq.getHeader("Authorization");
+        if (header != null && header.startsWith("Bearer ")) {
+            consumer.accept(header.substring(7));
+        }
+
+    }
+
+    @Generated
+    public AuthServiceImpl(final RSASSAVerifier rsassaVerifier, final AuthRepository authRepository, final ObjectMapper objectMapper, final AuthMappers authMapper, final JWSSigner jwssigner) {
+        this.rsassaVerifier = rsassaVerifier;
+        this.authRepository = authRepository;
+        this.objectMapper = objectMapper;
+        this.authMapper = authMapper;
+        this.jwssigner = jwssigner;
+    }
+}

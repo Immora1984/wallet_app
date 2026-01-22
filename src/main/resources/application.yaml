@@ -1,0 +1,34 @@
+logging:
+  level:
+    sql: debug
+
+spring:
+  jpa:
+    properties:
+      hibernate.jdbc.batch_size: 30
+      hibernate.order_updates: true
+      hibernate.order_inserts: true
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+
+  datasource:
+    url: ${POSTGRES_URL}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+
+  security:
+    jwt:
+      expires: 15m
+      private: rsa/private.pem
+      public: rsa/public.pem
+
+  main:
+    banner-mode: off
+  mvc:
+    problemdetails.enabled: true
+  web:
+    locale: ru
+
+server:
+  port: 8080

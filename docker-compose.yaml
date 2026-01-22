@@ -1,0 +1,19 @@
+version: '3.9'
+
+services:
+
+  postgres:
+    image: postgres:17-alpine
+    ports:
+      - "5433:5432"
+    env_file:
+      - .env
+
+  backend:
+    build: .
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    depends_on:
+      - postgres

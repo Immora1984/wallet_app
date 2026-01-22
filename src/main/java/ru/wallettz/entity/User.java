@@ -1,0 +1,44 @@
+package ru.wallettz.entity;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+import lombok.Generated;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.security.core.userdetails.UserDetails;
+
+@Entity
+@Getter
+@Setter
+@Table(
+        name = "APP_USER"
+)
+public class User implements UserDetails {
+    @Id
+    @GeneratedValue
+    private UUID id;
+    @CreationTimestamp
+    private LocalDateTime created;
+    @UpdateTimestamp
+    private LocalDateTime modified;
+    @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(2003)
+    private List<Role> authorities;
+    private String username;
+    private String password;
+    private boolean enabled;
+    private String firstName;
+    @OneToMany(mappedBy = "owner")
+    private List<Wallet> wallets;
+}
