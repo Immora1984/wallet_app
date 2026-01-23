@@ -4,15 +4,15 @@ import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
-import lombok.Generated;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,10 +23,9 @@ import ru.wallettz.dto.AuthTokenResponse;
 import ru.wallettz.entity.Auth;
 import ru.wallettz.entity.User;
 
+@Slf4j
 @Component
 public class AuthMappers {
-    @Generated
-    private static final Logger log = LoggerFactory.getLogger(AuthMappers.class);
 
     public Auth fromUser(User user) {
         var auth = new Auth();
@@ -34,6 +33,7 @@ public class AuthMappers {
         auth.setUser(user);
         return auth;
     }
+
 
     public AuthTokenResponse toAuthToken(Auth auth, long expires, Supplier<String> accessToken) {
         var token = new AuthTokenResponse();
@@ -47,7 +47,7 @@ public class AuthMappers {
 
     JWTClaimsSet toClaims(Auth auth, Date expires) {
         return (new JWTClaimsSet.Builder()).audience(auth.getUser().getAuthorities()
-                .stream().map(Enum::name).toList())
+                        .stream().map(Enum::name).toList())
                 .subject(auth.getUser().getId().toString()).expirationTime(expires).jwtID(auth.getJti())
                 .build();
     }
@@ -65,9 +65,9 @@ public class AuthMappers {
     }
 
     Authentication toAuthentication(BiFunction<String, UUID, Optional<Auth>> authProvider,
-                                           UUID subject,
-                                           String jwtId,
-                                           List<String> audience) {
+                                    UUID subject,
+                                    String jwtId,
+                                    List<String> audience) {
         var auth = new UsernamePasswordAuthenticationToken(
                 subject,
                 jwtId,

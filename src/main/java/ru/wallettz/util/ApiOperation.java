@@ -42,10 +42,6 @@ public @interface ApiOperation {
     @AliasFor(attribute = "produces", annotation = RequestMapping.class)
     String[] produces() default {};
 
-    @AliasFor(attribute = "summary", annotation = Operation.class)
-    String description() default "";
-
-    @AliasFor(attribute = "tags", annotation = Operation.class)
     String[] tags() default {};
 
     String authorize() default "isAuthenticated()";

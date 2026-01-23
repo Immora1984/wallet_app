@@ -16,9 +16,7 @@ import org.hibernate.annotations.CreationTimestamp;
 @Getter
 @Setter
 @Entity
-@Table(
-        name = "APP_AUTH"
-)
+@Table(name = "APP_AUTH")
 public class Auth {
     @Id
     @GeneratedValue

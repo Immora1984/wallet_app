@@ -10,7 +10,6 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import lombok.Generated;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -21,9 +20,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Entity
 @Getter
 @Setter
-@Table(
-        name = "APP_USER"
-)
+@Table(name = "APP_USER")
 public class User implements UserDetails {
     @Id
     @GeneratedValue

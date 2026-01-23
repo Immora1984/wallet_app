@@ -6,6 +6,6 @@ public enum Role implements GrantedAuthority {
     USER;
 
     public String getAuthority() {
-        return this.name();
+        return name();
     }
 }

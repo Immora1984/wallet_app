@@ -18,7 +18,6 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.wallettz.repository.UserRepository;
 
-
 @Slf4j
 @Configuration
 @RequiredArgsConstructor

@@ -35,9 +35,7 @@ public class WalletServiceImpl implements WalletService {
                 walletRepository.save(wallet);
                 break;
             case WITHDRAW:
-                if (balance.compareTo(request.getAmount()) < 0) {
-                    throw new WalletException.NotEnoughBalance();
-                }
+                if (balance.compareTo(request.getAmount()) < 0) throw new WalletException.NotEnoughBalance();
                 wallet.setBalance(balance.subtract(request.getAmount()));
                 this.walletRepository.save(wallet);
         }

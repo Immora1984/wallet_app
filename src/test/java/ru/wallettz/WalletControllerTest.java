@@ -2,6 +2,7 @@ package ru.wallettz;
 
 import java.util.Optional;
 import java.util.UUID;
+
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -29,6 +30,7 @@ import ru.wallettz.service.impl.WalletServiceImpl;
 )
 @Import({WalletServiceImpl.class})
 public class WalletControllerTest {
+
     @Autowired
     MockMvc mockMvc;
     @MockitoBean
@@ -39,45 +41,47 @@ public class WalletControllerTest {
     AuthRepository authRepository;
 
     @Test
-    @WithMockUser(
-            username = "ff07701e-0cf8-4cc1-8869-9e33b64eba10",
-            authorities = {"USER"}
-    )
+    @WithMockUser(username = "ff07701e-0cf8-4cc1-8869-9e33b64eba10", authorities = {"USER"})
     void successfulGetBalance() throws Exception {
-        Mockito.when(this.walletRepository.findById((UUID)Mockito.any(UUID.class))).thenReturn(Optional.of(WalletUtils.generateWallet()));
-        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/wallets/{walletId}", new Object[]{UUID.randomUUID().toString()}).with(SecurityMockMvcRequestPostProcessors.csrf())).andExpect(MockMvcResultMatchers.status().isOk());
+        Mockito.when(this.walletRepository.findById((UUID) Mockito.any(UUID.class))).thenReturn(Optional.of(WalletUtils.generateWallet()));
+        this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/wallets/" + UUID.randomUUID())
+                        .with(SecurityMockMvcRequestPostProcessors.csrf()))
+                .andExpect(
+                        MockMvcResultMatchers.status().isOk());
     }
 
     @Test
-    @WithMockUser(
-            username = "ff07701e-0cf8-4cc1-8869-9e33b64eba10",
-            authorities = {"USER"}
-    )
+    @WithMockUser(username = "ff07701e-0cf8-4cc1-8869-9e33b64eba10", authorities = {"USER"})
     void unsuccessfulGetBalance() throws Exception {
         Mockito.when(this.walletRepository.findById(Mockito.any(UUID.class))).thenReturn(Optional.empty());
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/wallets/{walletId}",
-                new Object[]{UUID.randomUUID().toString()})
-                .with(SecurityMockMvcRequestPostProcessors.csrf()))
-                .andExpect(MockMvcResultMatchers.status().is4xxClientError());
+        mockMvc.perform(
+                        MockMvcRequestBuilders.get("/api/v1/wallets/" + UUID.randomUUID())
+                                .with(SecurityMockMvcRequestPostProcessors.csrf()))
+                .andExpect(
+                        MockMvcResultMatchers.status().is4xxClientError());
     }
 
     @Test
-    @WithMockUser(
-            username = "ff07701e-0cf8-4cc1-8869-9e33b64eba10",
-            authorities = {"USER"}
-    )
+    @WithMockUser(username = "ff07701e-0cf8-4cc1-8869-9e33b64eba10", authorities = {"USER"})
     void successfulAction() throws Exception {
         Mockito.when(this.walletRepository.findById(Mockito.any(UUID.class))).thenReturn(Optional.of(WalletUtils.generateWallet()));
         Mockito.when(walletRepository.save(Mockito.any(Wallet.class))).thenReturn(WalletUtils.generateWallet());
-        this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/wallet").with(SecurityMockMvcRequestPostProcessors.csrf()).content(WalletUtils.getActionRequestBody()).contentType(MediaType.APPLICATION_JSON)).andExpect(MockMvcResultMatchers.status().isOk());
+        this.mockMvc.perform(
+                        MockMvcRequestBuilders.post("/api/v1/wallet")
+                                .with(SecurityMockMvcRequestPostProcessors.csrf())
+                                .content(WalletUtils.getActionRequestBody())
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(
+                        MockMvcResultMatchers.status().isOk());
     }
 
     @Test
-    @WithMockUser(
-            username = "ff07701e-0cf8-4cc1-8869-9e33b64eba10",
-            authorities = {"USER"}
-    )
+    @WithMockUser(username = "ff07701e-0cf8-4cc1-8869-9e33b64eba10", authorities = {"USER"})
     void unsuccessfulAction() throws Exception {
-        this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/wallet", new Object[0]).with(SecurityMockMvcRequestPostProcessors.csrf()).content(WalletUtils.getActionRequestBody()).contentType(MediaType.APPLICATION_JSON)).andExpect(MockMvcResultMatchers.status().is4xxClientError());
+        this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/wallet")
+                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+                        .content(WalletUtils.getActionRequestBody())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().is4xxClientError());
     }
 }
