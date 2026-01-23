@@ -14,7 +14,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import ru.wallettz.controllers.WalletController;
@@ -25,10 +24,8 @@ import ru.wallettz.repository.WalletRepository;
 import ru.wallettz.service.impl.WalletServiceImpl;
 
 @Slf4j
-@WebMvcTest(
-        controllers = {WalletController.class}
-)
 @Import({WalletServiceImpl.class})
+@WebMvcTest(controllers = {WalletController.class})
 public class WalletControllerTest {
 
     @Autowired
@@ -43,7 +40,7 @@ public class WalletControllerTest {
     @Test
     @WithMockUser(username = "ff07701e-0cf8-4cc1-8869-9e33b64eba10", authorities = {"USER"})
     void successfulGetBalance() throws Exception {
-        Mockito.when(this.walletRepository.findById((UUID) Mockito.any(UUID.class))).thenReturn(Optional.of(WalletUtils.generateWallet()));
+        Mockito.when(walletRepository.findById(Mockito.any(UUID.class))).thenReturn(Optional.of(WalletUtils.generateWallet()));
         this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/wallets/" + UUID.randomUUID())
                         .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andExpect(
