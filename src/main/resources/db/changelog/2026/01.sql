@@ -31,32 +31,5 @@ create index idx_auth_jti on app_auth (jti);
 
 --changeset migration:202601_01_5
 insert into app_user (id, created, modified, username, password, enabled, first_name, authorities)
-values ('ff07701e-0cf8-4cc1-8869-9e33b64eba10', current_timestamp, current_timestamp, 'user',
-        '{noop}user', true, 'Пользователь', '{USER}');
-
---changeset migration:202601_01_6
-create table app_wallet
-(
-    id       uuid primary key,
-    created  timestamp not null,
-    modified timestamp not null,
-    owner    uuid,
-    balance  numeric(19, 2),
-    constraint fk_card_user foreign key (owner) references app_user (id)
-);
-
---changeset migration:202601_01_7
-create index idx_wallet_user_id on app_wallet (owner);
--- индекс по user_id
-
---changeset migration:202601_01_8
-create index idx_wallet_number on app_wallet (id);
-
---changeset migration:202601_01_09
-alter table app_wallet
-    add column version integer not null default 0;
-
---changeset migration:202601_01_10
-insert into app_wallet (id, created, modified, owner, balance)
-values ('a8b3c7d1-1234-5678-9101-abcdef123456', current_timestamp, current_timestamp,
-        'ff07701e-0cf8-4cc1-8869-9e33b64eba10', 100000.00)
+values ('ff07701e-0cf8-4cc1-8869-9e33b64eba10', current_timestamp, current_timestamp, 'admin',
+        '{noop}admin', true, 'Админ', '{ADMIN}');

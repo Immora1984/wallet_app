@@ -19,7 +19,7 @@ spring:
 
   security:
     jwt:
-      expires: 15m
+      expires: 24h
       private: rsa/private.pem
       public: rsa/public.pem
 

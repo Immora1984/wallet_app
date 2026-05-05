@@ -3,7 +3,6 @@ package ru.wallettz;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ru.wallettz.dto.ActionRequest;
-import ru.wallettz.dto.OperationType;
 import ru.wallettz.entity.Wallet;
 
 import java.math.BigDecimal;
