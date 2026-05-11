@@ -1,4 +1,4 @@
-package ru.wallettz.service.impl;
+package ru.wallettz.auth.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
@@ -33,12 +33,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.wallettz.dto.AuthTokenResponse;
-import ru.wallettz.entity.Auth;
-import ru.wallettz.entity.User;
-import ru.wallettz.repository.AuthRepository;
-import ru.wallettz.service.AuthService;
-import ru.wallettz.util.AuthMappers;
+import ru.wallettz.auth.impl.jpa.Auth;
+import ru.wallettz.auth.model.AuthToken;
+import ru.wallettz.user.model.User;
+import ru.wallettz.auth.AuthRepository;
+import ru.wallettz.auth.AuthService;
 
 @Slf4j
 @Service
@@ -140,7 +139,7 @@ public class AuthServiceImpl implements AuthService {
         });
     }
 
-    AuthTokenResponse createToken(Auth auth) {
+    AuthToken createToken(Auth auth) {
         var current = new Date(Instant.now().plus(expires).toEpochMilli());
         return authMapper.toAuthToken(auth, current.getTime(), () -> {
             var jwt = authMapper.toSignedJWT(auth, current);

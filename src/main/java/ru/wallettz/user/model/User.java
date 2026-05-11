@@ -1,4 +1,4 @@
-package ru.wallettz.entity;
+package ru.wallettz.user.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

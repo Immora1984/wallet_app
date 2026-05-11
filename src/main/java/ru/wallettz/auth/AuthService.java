@@ -1,4 +1,4 @@
-package ru.wallettz.service;
+package ru.wallettz.auth;
 
 
 import jakarta.servlet.FilterChain;

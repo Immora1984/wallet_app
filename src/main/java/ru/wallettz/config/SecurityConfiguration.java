@@ -1,4 +1,4 @@
-package ru.wallettz.security;
+package ru.wallettz.config;
 
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
@@ -16,7 +16,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import ru.wallettz.repository.UserRepository;
+import ru.wallettz.user.UserRepository;
 
 @Slf4j
 @Configuration

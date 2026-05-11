@@ -1,4 +1,4 @@
-package ru.wallettz.entity;
+package ru.wallettz.auth.impl.jpa;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,6 +12,7 @@ import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import ru.wallettz.user.model.User;
 
 @Getter
 @Setter

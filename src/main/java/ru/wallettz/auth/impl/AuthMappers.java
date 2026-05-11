@@ -1,4 +1,4 @@
-package ru.wallettz.util;
+package ru.wallettz.auth.impl;
 
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
@@ -19,14 +19,16 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.stereotype.Component;
-import ru.wallettz.dto.AuthTokenResponse;
-import ru.wallettz.entity.Auth;
-import ru.wallettz.entity.User;
+import ru.wallettz.auth.AuthMapper;
+import ru.wallettz.auth.model.AuthToken;
+import ru.wallettz.auth.impl.jpa.Auth;
+import ru.wallettz.user.model.User;
 
 @Slf4j
 @Component
-public class AuthMappers {
+public class AuthMappers implements AuthMapper {
 
+    @Override
     public Auth fromUser(User user) {
         var auth = new Auth();
         auth.setJti(UUID.randomUUID().toString());
@@ -34,9 +36,9 @@ public class AuthMappers {
         return auth;
     }
 
-
-    public AuthTokenResponse toAuthToken(Auth auth, long expires, Supplier<String> accessToken) {
-        var token = new AuthTokenResponse();
+    @Override
+    public AuthToken toAuthToken(Auth auth, long expires, Supplier<String> accessToken) {
+        var token = new AuthToken();
         token.setRoles(auth.getUser().getAuthorities());
         token.setRefreshToken(auth.getId().toString());
         token.setAccessToken(accessToken.get());
