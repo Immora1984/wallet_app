@@ -1,8 +1,8 @@
-package ru.wallettz.auth;
+package ru.demo.auth;
 
-import ru.wallettz.auth.impl.jpa.Auth;
-import ru.wallettz.auth.model.AuthToken;
-import ru.wallettz.user.model.User;
+import ru.demo.auth.impl.jpa.Auth;
+import ru.demo.auth.model.AuthToken;
+import ru.demo.user.model.User;
 
 import java.util.function.Supplier;
 

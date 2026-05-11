@@ -1,4 +1,4 @@
-package ru.wallettz.auth.impl;
+package ru.demo.auth.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
@@ -33,11 +33,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.wallettz.auth.impl.jpa.Auth;
-import ru.wallettz.auth.model.AuthToken;
-import ru.wallettz.user.model.User;
-import ru.wallettz.auth.AuthRepository;
-import ru.wallettz.auth.AuthService;
+import ru.demo.auth.impl.jpa.Auth;
+import ru.demo.auth.model.AuthToken;
+import ru.demo.user.model.User;
+import ru.demo.auth.AuthRepository;
+import ru.demo.auth.AuthService;
 
 @Slf4j
 @Service

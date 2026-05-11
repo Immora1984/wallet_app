@@ -1,9 +1,9 @@
-package ru.wallettz.auth.model;
+package ru.demo.auth.model;
 
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
-import ru.wallettz.user.model.Role;
+import ru.demo.user.model.Role;
 
 @Getter
 @Setter

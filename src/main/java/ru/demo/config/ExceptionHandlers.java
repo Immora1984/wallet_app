@@ -1,4 +1,4 @@
-package ru.wallettz.config;
+package ru.demo.config;
 
 import java.util.List;
 import java.util.Map;

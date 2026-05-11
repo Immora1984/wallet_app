@@ -1,4 +1,4 @@
-package ru.wallettz.config;
+package ru.demo.config;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +16,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import ru.wallettz.auth.AuthService;
+import ru.demo.auth.AuthService;
 
 import java.util.List;
 

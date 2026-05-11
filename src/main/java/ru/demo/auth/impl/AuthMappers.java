@@ -1,4 +1,4 @@
-package ru.wallettz.auth.impl;
+package ru.demo.auth.impl;
 
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
@@ -19,10 +19,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.stereotype.Component;
-import ru.wallettz.auth.AuthMapper;
-import ru.wallettz.auth.model.AuthToken;
-import ru.wallettz.auth.impl.jpa.Auth;
-import ru.wallettz.user.model.User;
+import ru.demo.auth.AuthMapper;
+import ru.demo.auth.model.AuthToken;
+import ru.demo.auth.impl.jpa.Auth;
+import ru.demo.user.model.User;
 
 @Slf4j
 @Component

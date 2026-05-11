@@ -1,4 +1,4 @@
-package ru.wallettz.user.model;
+package ru.demo.user.model;
 
 import org.springframework.security.core.GrantedAuthority;
 

@@ -1,11 +1,10 @@
-package ru.wallettz.user.model;
+package ru.demo.user.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -36,6 +35,4 @@ public class User implements UserDetails {
     private String password;
     private boolean enabled;
     private String firstName;
-    @OneToMany(mappedBy = "owner")
-    private List<Wallet> wallets;
 }
