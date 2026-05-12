@@ -1,4 +1,4 @@
-package ru.demo.user.model;
+package ru.demo.user.impl.jpa;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -15,6 +15,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.userdetails.UserDetails;
+import ru.demo.user.model.Role;
 
 @Entity
 @Getter

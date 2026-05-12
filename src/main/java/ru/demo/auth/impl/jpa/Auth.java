@@ -12,7 +12,7 @@ import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import ru.demo.user.model.User;
+import ru.demo.user.impl.jpa.User;
 
 @Getter
 @Setter

@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 import ru.demo.auth.AuthMapper;
 import ru.demo.auth.model.AuthToken;
 import ru.demo.auth.impl.jpa.Auth;
-import ru.demo.user.model.User;
+import ru.demo.user.impl.jpa.User;
 
 @Slf4j
 @Component

@@ -34,8 +34,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.demo.auth.impl.jpa.Auth;
+import ru.demo.auth.model.AuthException;
+import ru.demo.auth.model.AuthRefresh;
 import ru.demo.auth.model.AuthToken;
-import ru.demo.user.model.User;
+import ru.demo.user.impl.jpa.User;
 import ru.demo.auth.AuthRepository;
 import ru.demo.auth.AuthService;
 
@@ -83,6 +85,16 @@ public class AuthServiceImpl implements AuthService {
         });
     }
 
+    @Override
+    public AuthToken updateAccessToken(AuthRefresh refresh) {
+        var auth = authRepository.findById(refresh.getRefreshToken()).orElseThrow(AuthException.Failed::new);
+
+        if (!auth.getUser().isEnabled())
+            throw new DisabledException("Пользователь деактивирован");
+        authRepository.save(auth);
+        return createToken(auth);
+    }
+
     void authenticateUsernamePasswordToken(HttpServletRequest rq, HttpServletResponse rp, UsernamePasswordAuthenticationToken token) {
         var user = (User) token.getPrincipal();
         if (!user.isEnabled()) {
@@ -91,6 +103,7 @@ public class AuthServiceImpl implements AuthService {
             authenticateUser(rp, user);
         }
     }
+
 
     void authenticateUser(HttpServletResponse rp, User user) {
         authenticate(rp, authMapper.fromUser(user));
