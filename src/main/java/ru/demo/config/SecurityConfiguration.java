@@ -6,8 +6,12 @@ import java.security.interfaces.RSAPublicKey;
 import com.nimbusds.jose.JWSSigner;
 import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jose.crypto.RSASSAVerifier;
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotNull;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NullMarked;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,12 +27,14 @@ import ru.demo.user.UserRepository;
 @RequiredArgsConstructor
 public class SecurityConfiguration implements UserDetailsService {
 
-    private final UserRepository userRepository;
 
     @Override
+    @NullMarked
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
     }
+
+    private final UserRepository userRepository;
 
     @Bean
     RSASSAVerifier rsassaVerifier(@Value("${spring.security.jwt.public}") RSAPublicKey publicKey) {
@@ -45,3 +51,4 @@ public class SecurityConfiguration implements UserDetailsService {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 }
+

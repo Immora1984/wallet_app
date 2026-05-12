@@ -2,7 +2,6 @@ package ru.demo.user.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedModel;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -27,8 +26,8 @@ public class UserController {
             tags = "Пользователи"
     )
     PagedModel<UserShort> search(@AuthenticationPrincipal UUID userId,
-                                 @ParameterObject UserSearch search,
-                                 @ParameterObject Pageable page) {
+                                 UserSearch search,
+                                 Pageable page) {
         return new PagedModel<>(userService.searchBy(search, userId, page));
     }
 

@@ -1,7 +1,5 @@
 package ru.demo.util;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.core.annotation.AliasFor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,7 +14,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @RequestMapping
 @PreAuthorize("({authorize})")
-@Operation(security = @SecurityRequirement(name = "auth"))
 public @interface ApiOperation {
     @AliasFor(attribute = "name", annotation = RequestMapping.class)
     String name() default "";

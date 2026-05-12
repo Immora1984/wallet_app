@@ -1,17 +1,15 @@
 package ru.demo.user.impl;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import ru.demo.user.UserRepository;
 import ru.demo.user.UserService;
+import ru.demo.user.impl.jpa.User_;
 import ru.demo.user.model.*;
 
 import java.time.LocalDateTime;
@@ -25,12 +23,6 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMappers userMapper;
-
-    @Override
-    public void createVerify(UserCreate model) {
-        if (userRepository.existsByUsername(model.getEmail()))
-            throw new UserException.AlreadyExists();
-    }
 
     @Override
     public Page<UserShort> searchBy(UserSearch search, UUID userId, Pageable page) {

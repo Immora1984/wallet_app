@@ -97,11 +97,10 @@ public class AuthServiceImpl implements AuthService {
 
     void authenticateUsernamePasswordToken(HttpServletRequest rq, HttpServletResponse rp, UsernamePasswordAuthenticationToken token) {
         var user = (User) token.getPrincipal();
-        if (!user.isEnabled()) {
-            throw new DisabledException("Пользователь деактивирован");
-        } else {
-            authenticateUser(rp, user);
-        }
+        if (user != null && !user.isEnabled()) throw new DisabledException("Пользователь деактивирован");
+
+        authenticateUser(rp, user);
+
     }
 
 

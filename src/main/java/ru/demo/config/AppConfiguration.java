@@ -1,5 +1,6 @@
 package ru.demo.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -72,5 +73,10 @@ public class AppConfiguration {
         var source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", cors);
         return source;
+    }
+
+    @Bean
+    ObjectMapper objectMapper() {
+        return new ObjectMapper();
     }
 }

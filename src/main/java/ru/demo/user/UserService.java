@@ -15,7 +15,5 @@ public interface UserService {
 
     void deleteUser(UUID userId, boolean isAuth);
 
-    void createVerify(UserCreate model);
-
     void userUpdate(UUID userId, UserUpdate request);
 }
