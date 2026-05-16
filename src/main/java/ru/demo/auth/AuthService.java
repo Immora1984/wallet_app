@@ -15,6 +15,7 @@ import ru.demo.auth.model.AuthToken;
 public interface AuthService {
     void jwtFilter(HttpServletRequest rq, HttpServletResponse rp, FilterChain chain) throws ServletException, IOException;
 
+
     void jwtFilter(ServletRequest rq, ServletResponse rp, FilterChain chain) throws ServletException, IOException;
 
     void authenticate(HttpServletRequest rq, HttpServletResponse rp, Authentication auth);

@@ -1,4 +1,4 @@
-package ru.demo.config;
+package ru.demo.config.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +17,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import ru.demo.auth.AuthService;
 
 import java.util.List;
@@ -26,12 +28,12 @@ import java.util.List;
 @EnableWebSecurity
 @EnableMethodSecurity
 @RequiredArgsConstructor
-public class AppConfiguration {
+public class AppConfiguration implements WebMvcConfigurer {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http,
                                             AuthService authService,
-                                            UrlBasedCorsConfigurationSource corsSource) throws Exception {
+                                            UrlBasedCorsConfigurationSource corsSource) {
         http.addFilterBefore(authService::jwtFilter, UsernamePasswordAuthenticationFilter.class);
         http.cors(it -> it.configurationSource(corsSource));
         http.csrf(AbstractHttpConfigurer::disable);
@@ -66,7 +68,7 @@ public class AppConfiguration {
         var cors = new CorsConfiguration();
         cors.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
         cors.setExposedHeaders(List.of("Authorization", "Set-Cookie"));
-        cors.setAllowedOrigins(List.of("http://localhost:3000"));
+        cors.setAllowedOrigins(List.of("http://localhost:5173"));
         cors.setAllowedHeaders(List.of("*"));
         cors.setAllowCredentials(true);
 

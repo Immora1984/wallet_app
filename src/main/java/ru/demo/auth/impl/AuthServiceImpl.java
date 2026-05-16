@@ -25,6 +25,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -47,6 +50,7 @@ import ru.demo.auth.AuthService;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
+    private final KafkaTemplate<String, String> kafkaTemplate;
     private final RSASSAVerifier rsassaVerifier;
     private final AuthRepository authRepository;
     private final ObjectMapper objectMapper;
@@ -64,6 +68,7 @@ public class AuthServiceImpl implements AuthService {
         chain.doFilter(rq, rp);
     }
 
+    @Override
     public void jwtFilter(ServletRequest rq, ServletResponse rp, FilterChain chain) throws ServletException, IOException {
         jwtFilter((HttpServletRequest) rq, (HttpServletResponse) rp, chain);
     }

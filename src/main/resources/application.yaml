@@ -2,6 +2,23 @@ logging:
   level:
     sql: debug
 
+kafka:
+  bootstrap-servers: localhost:9092 # Адрес вашего Kafka брокера
+  producer:
+    key-serializer: org.apache.kafka.common.serialization.StringSerializer
+    value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+  consumer:
+    group-id: my-app-group # Группа потребителя
+    key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+    properties:
+      spring:
+        json:
+          trusted:
+            packages: '*' # Разрешаем десериализацию из любого пакета
+app:
+  kafka:
+    topic: user-events
 spring:
   jpa:
     properties:
@@ -26,6 +43,9 @@ spring:
   main:
     banner-mode: off
   mvc:
+    view:
+      suffix: .html
+      prefix: /static/
     problemdetails.enabled: true
   web:
     locale: ru

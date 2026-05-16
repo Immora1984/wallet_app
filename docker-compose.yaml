@@ -1,6 +1,11 @@
-version: '3.9'
-
 services:
+
+  kafka:
+    image:  apache/kafka:4.2.0
+    ports:
+      - "9092:9092"
+    env_file:
+      - .env
 
   postgres:
     image: postgres:17-alpine

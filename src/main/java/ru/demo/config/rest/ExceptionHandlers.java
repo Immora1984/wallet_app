@@ -1,4 +1,4 @@
-package ru.demo.config;
+package ru.demo.config.rest;
 
 import java.util.List;
 import java.util.Map;
