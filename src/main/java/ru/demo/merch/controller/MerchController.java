@@ -2,6 +2,8 @@ package ru.demo.merch.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedModel;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -25,5 +27,14 @@ public class MerchController {
     )
     MerchShort createMerch(@RequestBody @Valid MerchCreate request) {
         return merchService.createMerch(request);
+    }
+
+    @ApiOperation(
+            method = RequestMethod.GET,
+            tags = "Мерч",
+            authorize = "permitAll()"
+    )
+    PagedModel<MerchShort> findAll(Pageable pageable) {
+        return new PagedModel<>(merchService.search(pageable));
     }
 }

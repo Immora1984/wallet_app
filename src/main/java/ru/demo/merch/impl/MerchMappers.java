@@ -27,6 +27,7 @@ public class MerchMappers implements MerchMapper {
         target.setSize(merch.getSize());
         target.setColor(merch.getColor());
         target.setPrice(merch.getPrice());
+        target.setPhotos(merch.getPhotos());
         return target;
     }
 }

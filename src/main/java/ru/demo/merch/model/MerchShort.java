@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -14,4 +15,5 @@ public class MerchShort {
     private String band;
     private String color;
     private BigDecimal price;
+    private List<String> photos;
 }
