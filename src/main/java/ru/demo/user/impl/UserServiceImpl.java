@@ -2,18 +2,15 @@ package ru.demo.user.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import ru.demo.user.UserRepository;
 import ru.demo.user.UserService;
 import ru.demo.user.impl.jpa.User_;
 import ru.demo.user.model.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -22,16 +19,8 @@ import java.util.UUID;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final KafkaTemplate<String, String> kafkaTemplate;
     private final UserMappers userMapper;
-
-    @Override
-    public Page<UserShort> searchBy(UserSearch search, UUID userId, Pageable page) {
-        return userRepository.findBy(Specification.allOf(
-                (r, cq, cb) -> StringUtils.hasText(search.getFirstName())
-                        ? cb.like(cb.lower(r.get(User_.FIRST_NAME)), '%' + search.getFirstName().toLowerCase() + '%')
-                        : null
-        ), query -> query.page(page).map(userMapper::toShort));
-    }
 
     @Override
     public UserDetail getById(UUID id) {
@@ -43,13 +32,25 @@ public class UserServiceImpl implements UserService {
 
         var result = userRepository.update((rt, cu, cb) -> {
 
-            cu.set(rt.get(User_.FIRST_NAME), request.getFirstname());
             cu.set(rt.get(User_.MODIFIED), LocalDateTime.now());
 
             return cb.and(cb.equal(rt.get(User_.ID), userId));
         });
 
         if (result != 1) throw new UserException.NotFound();
+    }
+
+    @Override
+    public void registerUser(UserCreate userCreate) {
+        if (userRepository.existsByUsername(userCreate.getUsername())) throw new UserException.AlreadyExists();
+        userRepository.save(userMapper.fromCreate(userCreate));
+
+        kafkaTemplate.send("user-registrations", "Hello");
+    }
+
+    @KafkaListener(id = "register", topics = "user-registrations")
+    public void registerEvent(String string) {
+        System.out.println(string);
     }
 
     @Override

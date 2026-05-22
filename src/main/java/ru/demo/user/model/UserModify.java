@@ -17,15 +17,9 @@ public class UserModify {
         private String newPassword;
     }
 
-    @Setter
-    @Getter
-    public static class BecomeOwner {
-        private String name;
-    }
-
     @Getter
     @Setter
     public static class UserUpdate {
-        private String firstname;
+        private String username;
     }
 }

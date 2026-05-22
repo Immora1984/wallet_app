@@ -1,9 +1,8 @@
 package ru.demo.user.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PagedModel;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import ru.demo.user.UserService;
@@ -20,16 +19,6 @@ import java.util.UUID;
 public class UserController {
 
     private final UserService userService;
-
-    @ApiOperation(
-            method = RequestMethod.GET,
-            tags = "Пользователи"
-    )
-    PagedModel<UserShort> search(@AuthenticationPrincipal UUID userId,
-                                 UserSearch search,
-                                 Pageable page) {
-        return new PagedModel<>(userService.searchBy(search, userId, page));
-    }
 
     @ApiOperation(
             path = "/{id}",
@@ -67,5 +56,14 @@ public class UserController {
     )
     void updateUser(@PathVariable UUID userId, @RequestBody UserUpdate request) {
         userService.userUpdate(userId, request);
+    }
+
+    @ApiOperation(
+            method = RequestMethod.POST,
+            authorize = "permitAll()",
+            tags = "Пользователи"
+    )
+    void registerUser(@Valid @RequestBody UserCreate userCreate) {
+        userService.registerUser(userCreate);
     }
 }
