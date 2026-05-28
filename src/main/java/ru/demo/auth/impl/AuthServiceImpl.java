@@ -5,7 +5,6 @@ import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSSigner;
 import com.nimbusds.jose.crypto.RSASSAVerifier;
 import com.nimbusds.jwt.SignedJWT;
-import jakarta.mail.MessagingException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletOutputStream;
@@ -27,11 +26,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
-import org.springframework.mail.MailSender;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -45,9 +39,6 @@ import ru.demo.auth.impl.jpa.Auth;
 import ru.demo.auth.model.AuthException;
 import ru.demo.auth.model.AuthRefresh;
 import ru.demo.auth.model.AuthToken;
-import ru.demo.notification.NotificationService;
-import ru.demo.notification.model.NotificationCreate;
-import ru.demo.notification.model.NotificationType;
 import ru.demo.user.UserService;
 import ru.demo.user.impl.jpa.User;
 import ru.demo.auth.AuthRepository;
@@ -61,12 +52,10 @@ public class AuthServiceImpl implements AuthService {
 
     private final RSASSAVerifier rsassaVerifier;
     private final AuthRepository authRepository;
-    private final JavaMailSender mailSender;
     private final ObjectMapper objectMapper;
     private final AuthMappers authMapper;
     private final UserService userService;
     private final JWSSigner jwssigner;
-    private final NotificationService notificationService;
 
     @Value("${spring.security.jwt.expires}")
     private Duration expires;
@@ -87,7 +76,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void authenticate(HttpServletRequest rq, HttpServletResponse rp, Authentication auth) {
         if (auth instanceof UsernamePasswordAuthenticationToken token)
-            authenticateUsernamePasswordToken(rq, rp, token);
+            authenticateUsernamePasswordToken(rp, token);
 
         if (auth instanceof OAuth2AuthenticationToken oauthToken) {
             authenticateOAuth2Token(rp, oauthToken);
@@ -102,14 +91,6 @@ public class AuthServiceImpl implements AuthService {
                     token.getRefreshToken());
 
             rp.addHeader(HttpHeaders.SET_COOKIE, cookieHeader);
-
-            var notification = new NotificationCreate();
-            notification.setType(NotificationType.EMAIL);
-            notification.setHeader("Добро пожаловать!");
-            notification.setRecipient(oauthToken.getName());
-            notification.setTemplate("oauth2.ftl");
-
-            notificationService.sendAsync(notification);
 
             rp.sendRedirect("http://localhost:5173/login?token=" + token.getAccessToken());
 
@@ -126,11 +107,6 @@ public class AuthServiceImpl implements AuthService {
                 }
             }
         }
-    }
-
-    @Async
-    public void sendWelcomeEmailAsync(String to) {
-
     }
 
     public void failure(HttpServletRequest rq, HttpServletResponse rp, RuntimeException except) {
@@ -154,7 +130,7 @@ public class AuthServiceImpl implements AuthService {
         return createToken(auth);
     }
 
-    void authenticateUsernamePasswordToken(HttpServletRequest rq, HttpServletResponse rp, UsernamePasswordAuthenticationToken token) {
+    void authenticateUsernamePasswordToken(HttpServletResponse rp, UsernamePasswordAuthenticationToken token) {
         var user = (User) token.getPrincipal();
         if (user != null && !user.isEnabled()) throw new DisabledException("Пользователь деактивирован");
 

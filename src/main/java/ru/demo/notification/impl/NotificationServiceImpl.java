@@ -29,8 +29,8 @@ public class NotificationServiceImpl implements NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final NotificationMapper notificationMapper;
-    private final Configuration ftlFactory;
     private final JavaMailSender mailSender;
+    private final Configuration ftlFactory;
 
     @Async
     @Override
@@ -45,7 +45,7 @@ public class NotificationServiceImpl implements NotificationService {
         } catch (Exception e) {
             notification.setStatus(NotificationStatus.ERROR);
         }
-        notification.setStatus(NotificationStatus.DELIVERED);
+        notification.setStatus(NotificationStatus.SEND);
 
         notificationRepository.save(notification);
     }

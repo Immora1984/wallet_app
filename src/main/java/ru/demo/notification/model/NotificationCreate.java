@@ -18,4 +18,17 @@ public class NotificationCreate {
     @NotBlank
     private String recipient;
     private String header;
+
+    public static class NotificationTemplate {
+
+        public static NotificationCreate welcomeTemplate(String recipient) {
+            var notification = new NotificationCreate();
+            notification.setType(NotificationType.EMAIL);
+            notification.setHeader("Добро пожаловать!");
+            notification.setRecipient(recipient);
+            notification.setTemplate("oauth2.ftl");
+
+            return notification;
+        }
+    }
 }
