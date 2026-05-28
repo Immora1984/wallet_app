@@ -85,4 +85,5 @@ public class AppConfiguration implements WebMvcConfigurer {
     ObjectMapper objectMapper() {
         return new ObjectMapper();
     }
+
 }

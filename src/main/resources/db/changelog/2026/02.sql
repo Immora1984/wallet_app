@@ -19,4 +19,16 @@ create index idx_merch_band on app_merch(band);
 alter table app_user add column email varchar;
 
 --changeset migration:202602_01_4
-alter table app_user drop column if exists first_name
+alter table app_user drop column if exists first_name;
+
+--changeset migration:202602_01_5
+create table app_notification(
+    id uuid primary key,
+    creation timestamp(6),
+    modified timestamp(6),
+    type varchar not null,
+    status varchar,
+    recipient varchar not null,
+    header varchar,
+    body varchar not null
+)

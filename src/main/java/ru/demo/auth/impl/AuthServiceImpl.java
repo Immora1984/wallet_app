@@ -45,6 +45,9 @@ import ru.demo.auth.impl.jpa.Auth;
 import ru.demo.auth.model.AuthException;
 import ru.demo.auth.model.AuthRefresh;
 import ru.demo.auth.model.AuthToken;
+import ru.demo.notification.NotificationService;
+import ru.demo.notification.model.NotificationCreate;
+import ru.demo.notification.model.NotificationType;
 import ru.demo.user.UserService;
 import ru.demo.user.impl.jpa.User;
 import ru.demo.auth.AuthRepository;
@@ -63,6 +66,7 @@ public class AuthServiceImpl implements AuthService {
     private final AuthMappers authMapper;
     private final UserService userService;
     private final JWSSigner jwssigner;
+    private final NotificationService notificationService;
 
     @Value("${spring.security.jwt.expires}")
     private Duration expires;
@@ -99,17 +103,19 @@ public class AuthServiceImpl implements AuthService {
 
             rp.addHeader(HttpHeaders.SET_COOKIE, cookieHeader);
 
-            // Отправляем email асинхронно (не блокируем)
-            sendWelcomeEmailAsync(oauthToken.getName());
+            var notification = new NotificationCreate();
+            notification.setType(NotificationType.EMAIL);
+            notification.setHeader("Добро пожаловать!");
+            notification.setRecipient(oauthToken.getName());
+            notification.setTemplate("oauth2.ftl");
 
-            // Редирект должен быть последним действием
+            notificationService.sendAsync(notification);
+
             rp.sendRedirect("http://localhost:5173/login?token=" + token.getAccessToken());
 
         } catch (Exception e) {
             log.error("OAuth2 authentication failed: {}", e.getMessage());
 
-            // Нельзя делать sendError после sendRedirect
-            // Просто отправляем ошибку с правильным статусом
             if (!rp.isCommitted()) {
                 rp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 rp.setContentType("application/json");
@@ -124,17 +130,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Async
     public void sendWelcomeEmailAsync(String to) {
-        try {
-            var message = mailSender.createMimeMessage();
-            var helper = new MimeMessageHelper(message, true, "UTF-8");
-            helper.setTo(to);
-            helper.setSubject("Welcome to Wallet App");
-            helper.setText("Thank you for registration with Wallet App!", false);
-            mailSender.send(message);
-            log.info("Welcome email sent to {}", to);
-        } catch (MessagingException e) {
-            log.error("Failed to send welcome email to {}: {}", to, e.getMessage());
-        }
+
     }
 
     public void failure(HttpServletRequest rq, HttpServletResponse rp, RuntimeException except) {
