@@ -18,7 +18,6 @@ import java.text.ParseException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
-import java.util.List;
 import java.util.function.Consumer;
 
 import lombok.RequiredArgsConstructor;
@@ -27,9 +26,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
-import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -56,7 +52,6 @@ import ru.demo.user.model.Role;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
-    private final UserRepository userRepository;
     private final RSASSAVerifier rsassaVerifier;
     private final AuthRepository authRepository;
     private final ObjectMapper objectMapper;
@@ -86,11 +81,11 @@ public class AuthServiceImpl implements AuthService {
             authenticateUsernamePasswordToken(rq, rp, token);
 
         if (auth instanceof OAuth2AuthenticationToken oauthToken) {
-            authenticateOAuth2Token(rq, rp, oauthToken);
+            authenticateOAuth2Token(rp, oauthToken);
         }
     }
 
-    void authenticateOAuth2Token(HttpServletRequest rq, HttpServletResponse rp, OAuth2AuthenticationToken oauthToken) throws IOException {
+    void authenticateOAuth2Token(HttpServletResponse rp, OAuth2AuthenticationToken oauthToken) throws IOException {
         try {
             var user = userService.importOAuth2(oauthToken.getPrincipal());
             var token = createToken(authRepository.save(authMapper.fromUser(user)));

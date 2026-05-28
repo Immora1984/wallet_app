@@ -2,7 +2,6 @@ package ru.demo.user.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import ru.demo.user.UserRepository;
@@ -20,7 +19,6 @@ import java.util.UUID;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final KafkaTemplate<String, String> kafkaTemplate;
     private final UserMappers userMapper;
 
     @Override
