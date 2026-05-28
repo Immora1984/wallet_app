@@ -9,6 +9,7 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
+import ru.demo.auth.impl.jpa.Auth;
 import ru.demo.auth.model.AuthRefresh;
 import ru.demo.auth.model.AuthToken;
 
@@ -18,11 +19,13 @@ public interface AuthService {
 
     void jwtFilter(ServletRequest rq, ServletResponse rp, FilterChain chain) throws ServletException, IOException;
 
-    void authenticate(HttpServletRequest rq, HttpServletResponse rp, Authentication auth);
+    void authenticate(HttpServletRequest rq, HttpServletResponse rp, Authentication auth) throws IOException;
 
     void failure(HttpServletRequest rq, HttpServletResponse rp, RuntimeException except);
 
     void logout(HttpServletRequest rq, HttpServletResponse rp, Authentication auth);
 
     AuthToken updateAccessToken(AuthRefresh refresh);
+
+    AuthToken createToken(Auth auth);
 }

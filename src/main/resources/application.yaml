@@ -16,10 +16,9 @@ kafka:
         json:
           trusted:
             packages: '*' # Разрешаем десериализацию из любого пакета
-app:
-  kafka:
-    topic: user-events
+
 spring:
+
   jpa:
     properties:
       hibernate.jdbc.batch_size: 30
@@ -35,6 +34,19 @@ spring:
     password: ${POSTGRES_PASSWORD}
 
   security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${OAUTH2_GOOGLE_CLIENT_ID}
+            client-secret: ${OAUTH2_GOOGLE_CLIENT_SECRET}
+            scope: [ email, profile ]
+            redirect-uri: ${server.url}/login/oauth2/code/google
+
+        provider:
+          google:
+            user-name-attribute: email
+
     jwt:
       expires: 24h
       private: rsa/private.pem
@@ -42,13 +54,9 @@ spring:
 
   main:
     banner-mode: off
-  mvc:
-    view:
-      suffix: .html
-      prefix: /static/
+
     problemdetails.enabled: true
-  web:
-    locale: ru
 
 server:
   port: 8080
+  url: ${BASE_URL:http://localhost:${server.port}}

@@ -12,6 +12,9 @@ import ru.demo.merch.MerchService;
 import ru.demo.merch.model.MerchCreate;
 import ru.demo.merch.model.MerchShort;
 
+import java.util.List;
+import java.util.UUID;
+
 @Slf4j
 @Service
 @Transactional
@@ -29,5 +32,10 @@ public class MerchServiceImpl implements MerchService {
     @Override
     public Page<MerchShort> search(Pageable pageable) {
         return merchRepository.findAll(pageable).map(merchMapper::toShort);
+    }
+
+    @Override
+    public void deleteByListId(List<UUID> request) {
+        if (request != null && !request.isEmpty()) merchRepository.deleteAllById(request);
     }
 }

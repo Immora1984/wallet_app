@@ -18,11 +18,13 @@ import java.text.ParseException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 import java.util.function.Consumer;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -34,15 +36,19 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.demo.auth.impl.jpa.Auth;
 import ru.demo.auth.model.AuthException;
 import ru.demo.auth.model.AuthRefresh;
 import ru.demo.auth.model.AuthToken;
+import ru.demo.user.UserRepository;
+import ru.demo.user.UserService;
 import ru.demo.user.impl.jpa.User;
 import ru.demo.auth.AuthRepository;
 import ru.demo.auth.AuthService;
+import ru.demo.user.model.Role;
 
 @Slf4j
 @Service
@@ -50,11 +56,12 @@ import ru.demo.auth.AuthService;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
-    private final KafkaTemplate<String, String> kafkaTemplate;
+    private final UserRepository userRepository;
     private final RSASSAVerifier rsassaVerifier;
     private final AuthRepository authRepository;
     private final ObjectMapper objectMapper;
     private final AuthMappers authMapper;
+    private final UserService userService;
     private final JWSSigner jwssigner;
 
     @Value("${spring.security.jwt.expires}")
@@ -73,9 +80,27 @@ public class AuthServiceImpl implements AuthService {
         jwtFilter((HttpServletRequest) rq, (HttpServletResponse) rp, chain);
     }
 
-    public void authenticate(HttpServletRequest rq, HttpServletResponse rp, Authentication auth) {
-        if (auth instanceof UsernamePasswordAuthenticationToken token) {
+    @Override
+    public void authenticate(HttpServletRequest rq, HttpServletResponse rp, Authentication auth) throws IOException {
+        if (auth instanceof UsernamePasswordAuthenticationToken token)
             authenticateUsernamePasswordToken(rq, rp, token);
+
+        if (auth instanceof OAuth2AuthenticationToken oauthToken) {
+            authenticateOAuth2Token(rq, rp, oauthToken);
+        }
+    }
+
+    void authenticateOAuth2Token(HttpServletRequest rq, HttpServletResponse rp, OAuth2AuthenticationToken oauthToken) throws IOException {
+        try {
+            var user = userService.importOAuth2(oauthToken.getPrincipal());
+            var token = createToken(authRepository.save(authMapper.fromUser(user)));
+            var cookieHeader = String.format("Authorization=%s; Path=/; HttpOnly; SameSite=Lax; Max-Age=604800",
+                    token.getRefreshToken());
+
+            rp.addHeader(HttpHeaders.SET_COOKIE, cookieHeader);
+            rp.sendRedirect("http://localhost:5173/login?token=" + token.getAccessToken());
+        } catch (Exception e) {
+            rp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Server error");
         }
     }
 
@@ -112,6 +137,7 @@ public class AuthServiceImpl implements AuthService {
     void authenticateUser(HttpServletResponse rp, User user) {
         authenticate(rp, authMapper.fromUser(user));
     }
+
 
     void authenticate(HttpServletResponse rp, Auth auth) {
         successHandle(rp, authRepository.save(auth));
@@ -156,7 +182,8 @@ public class AuthServiceImpl implements AuthService {
         });
     }
 
-    AuthToken createToken(Auth auth) {
+    @Override
+    public AuthToken createToken(Auth auth) {
         var current = new Date(Instant.now().plus(expires).toEpochMilli());
         return authMapper.toAuthToken(auth, current.getTime(), () -> {
             var jwt = authMapper.toSignedJWT(auth, current);

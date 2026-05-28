@@ -9,6 +9,8 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+
+import jakarta.validation.constraints.Email;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -35,4 +37,6 @@ public class User implements UserDetails {
     private String username;
     private String password;
     private boolean enabled;
+    @Email
+    private String email;
 }

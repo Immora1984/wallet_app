@@ -17,7 +17,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import ru.demo.auth.AuthService;
 
@@ -27,7 +26,7 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-@RequiredArgsConstructor
+@RequiredArgsConstructor // Сгенерирует конструктор только для oAuth2SuccessHandler
 public class AppConfiguration implements WebMvcConfigurer {
 
     @Bean
@@ -45,6 +44,11 @@ public class AppConfiguration implements WebMvcConfigurer {
         http.exceptionHandling(except -> except
                 .authenticationEntryPoint(authService::failure)
                 .accessDeniedHandler(authService::failure)
+        );
+
+        http.oauth2Login(login -> login
+                .successHandler(authService::authenticate)
+                .failureHandler(authService::failure)
         );
 
         http.formLogin(login -> login
