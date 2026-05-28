@@ -2,6 +2,7 @@ package ru.demo.auth;
 
 import java.io.IOException;
 
+import jakarta.mail.MessagingException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
@@ -19,7 +20,7 @@ public interface AuthService {
 
     void jwtFilter(ServletRequest rq, ServletResponse rp, FilterChain chain) throws ServletException, IOException;
 
-    void authenticate(HttpServletRequest rq, HttpServletResponse rp, Authentication auth) throws IOException;
+    void authenticate(HttpServletRequest rq, HttpServletResponse rp, Authentication auth);
 
     void failure(HttpServletRequest rq, HttpServletResponse rp, RuntimeException except);
 

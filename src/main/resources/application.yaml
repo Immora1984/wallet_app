@@ -1,24 +1,4 @@
-logging:
-  level:
-    sql: debug
-
-kafka:
-  bootstrap-servers: localhost:9092 # Адрес вашего Kafka брокера
-  producer:
-    key-serializer: org.apache.kafka.common.serialization.StringSerializer
-    value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-  consumer:
-    group-id: my-app-group # Группа потребителя
-    key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-    value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-    properties:
-      spring:
-        json:
-          trusted:
-            packages: '*' # Разрешаем десериализацию из любого пакета
-
 spring:
-
   jpa:
     properties:
       hibernate.jdbc.batch_size: 30
@@ -42,7 +22,6 @@ spring:
             client-secret: ${OAUTH2_GOOGLE_CLIENT_SECRET}
             scope: [ email, profile ]
             redirect-uri: ${server.url}/login/oauth2/code/google
-
         provider:
           google:
             user-name-attribute: email
@@ -52,11 +31,37 @@ spring:
       private: rsa/private.pem
       public: rsa/public.pem
 
+  mail:
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    ssl.enabled: true
+
   main:
     banner-mode: off
-
     problemdetails.enabled: true
 
 server:
   port: 8080
   url: ${BASE_URL:http://localhost:${server.port}}
+
+logging:
+  level:
+    sql: debug
+
+
+#  kafka:
+#    bootstrap-servers: localhost:9092 # Адрес вашего Kafka брокера
+#    producer:
+#      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+#      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+#    consumer:
+#      group-id: my-app-group # Группа потребителя
+#      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+#      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+#      properties:
+#        spring:
+#          json:
+#            trusted:
+#              packages: '*' # Разрешаем десериализацию из любого пакета

@@ -5,6 +5,7 @@ import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSSigner;
 import com.nimbusds.jose.crypto.RSASSAVerifier;
 import com.nimbusds.jwt.SignedJWT;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletOutputStream;
@@ -26,6 +27,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -39,12 +45,10 @@ import ru.demo.auth.impl.jpa.Auth;
 import ru.demo.auth.model.AuthException;
 import ru.demo.auth.model.AuthRefresh;
 import ru.demo.auth.model.AuthToken;
-import ru.demo.user.UserRepository;
 import ru.demo.user.UserService;
 import ru.demo.user.impl.jpa.User;
 import ru.demo.auth.AuthRepository;
 import ru.demo.auth.AuthService;
-import ru.demo.user.model.Role;
 
 @Slf4j
 @Service
@@ -54,6 +58,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final RSASSAVerifier rsassaVerifier;
     private final AuthRepository authRepository;
+    private final JavaMailSender mailSender;
     private final ObjectMapper objectMapper;
     private final AuthMappers authMapper;
     private final UserService userService;
@@ -76,7 +81,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void authenticate(HttpServletRequest rq, HttpServletResponse rp, Authentication auth) throws IOException {
+    public void authenticate(HttpServletRequest rq, HttpServletResponse rp, Authentication auth) {
         if (auth instanceof UsernamePasswordAuthenticationToken token)
             authenticateUsernamePasswordToken(rq, rp, token);
 
@@ -85,7 +90,7 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
-    void authenticateOAuth2Token(HttpServletResponse rp, OAuth2AuthenticationToken oauthToken) throws IOException {
+    void authenticateOAuth2Token(HttpServletResponse rp, OAuth2AuthenticationToken oauthToken) {
         try {
             var user = userService.importOAuth2(oauthToken.getPrincipal());
             var token = createToken(authRepository.save(authMapper.fromUser(user)));
@@ -93,9 +98,42 @@ public class AuthServiceImpl implements AuthService {
                     token.getRefreshToken());
 
             rp.addHeader(HttpHeaders.SET_COOKIE, cookieHeader);
+
+            // Отправляем email асинхронно (не блокируем)
+            sendWelcomeEmailAsync(oauthToken.getName());
+
+            // Редирект должен быть последним действием
             rp.sendRedirect("http://localhost:5173/login?token=" + token.getAccessToken());
+
         } catch (Exception e) {
-            rp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Server error");
+            log.error("OAuth2 authentication failed: {}", e.getMessage());
+
+            // Нельзя делать sendError после sendRedirect
+            // Просто отправляем ошибку с правильным статусом
+            if (!rp.isCommitted()) {
+                rp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                rp.setContentType("application/json");
+                try {
+                    rp.getWriter().write("{\"error\": \"Authentication failed: " + e.getMessage() + "\"}");
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        }
+    }
+
+    @Async
+    public void sendWelcomeEmailAsync(String to) {
+        try {
+            var message = mailSender.createMimeMessage();
+            var helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setTo(to);
+            helper.setSubject("Welcome to Wallet App");
+            helper.setText("Thank you for registration with Wallet App!", false);
+            mailSender.send(message);
+            log.info("Welcome email sent to {}", to);
+        } catch (MessagingException e) {
+            log.error("Failed to send welcome email to {}: {}", to, e.getMessage());
         }
     }
 
