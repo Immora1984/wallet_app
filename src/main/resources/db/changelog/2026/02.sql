@@ -34,4 +34,7 @@ create table app_notification(
 );
 
 --changeset migration:202602_01_6
-alter table app_merch add column compound varchar[];
+alter table app_merch add column if not exists description text;
+
+--changeset migration:202602_01_7
+alter table app_merch add column if not exists compound jsonb;

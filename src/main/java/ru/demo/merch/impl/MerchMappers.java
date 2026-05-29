@@ -18,6 +18,7 @@ public class MerchMappers implements MerchMapper {
         merch.setSize(merchCreate.getSize());
         merch.setPrice(merchCreate.getPrice());
         merch.setCompound(merchCreate.getCompound());
+        merch.setDescription(merchCreate.getDescription());
         return merch;
     }
 
@@ -31,6 +32,7 @@ public class MerchMappers implements MerchMapper {
         target.setPrice(merch.getPrice());
         target.setPhotos(merch.getPhotos());
         target.setCompound(merch.getCompound());
+        target.setDescription(merch.getDescription());
         return target;
     }
 
@@ -44,6 +46,7 @@ public class MerchMappers implements MerchMapper {
         target.setColor(merch.getColor());
         target.setPhotos(merch.getPhotos());
         target.setCompound(merch.getCompound());
+        target.setDescription(merch.getDescription());
         return target;
     }
 }

@@ -33,7 +33,7 @@ public class Merch {
     @JdbcTypeCode(SqlTypes.ARRAY)
     private List<String> photos;
 
-    @JdbcTypeCode(SqlTypes.ARRAY)
+    @JdbcTypeCode(SqlTypes.JSON)
     private List<Compound> compound;
 
     private String size;
@@ -41,5 +41,4 @@ public class Merch {
     private String color;
     private BigDecimal price;
     private String description;
-
 }
