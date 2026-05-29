@@ -23,7 +23,7 @@ import java.util.UUID;
 public class Merch {
     @Id
     @GeneratedValue
-    private UUID Id;
+    private UUID id;
 
     @CreationTimestamp
     private LocalDateTime created;

@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import ru.demo.merch.MerchMapper;
 import ru.demo.merch.impl.jpa.Merch;
 import ru.demo.merch.model.MerchCreate;
+import ru.demo.merch.model.MerchDetail;
 import ru.demo.merch.model.MerchShort;
 
 @Component
@@ -27,6 +28,18 @@ public class MerchMappers implements MerchMapper {
         target.setSize(merch.getSize());
         target.setColor(merch.getColor());
         target.setPrice(merch.getPrice());
+        target.setPhotos(merch.getPhotos());
+        return target;
+    }
+
+    @Override
+    public MerchDetail toDetail(Merch merch) {
+        var target = new MerchDetail();
+        target.setId(merch.getId());
+        target.setBand(merch.getBand());
+        target.setSize(merch.getSize());
+        target.setPrice(merch.getPrice());
+        target.setColor(merch.getColor());
         target.setPhotos(merch.getPhotos());
         return target;
     }

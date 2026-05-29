@@ -3,6 +3,7 @@ package ru.demo.merch;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import ru.demo.merch.model.MerchCreate;
+import ru.demo.merch.model.MerchDetail;
 import ru.demo.merch.model.MerchShort;
 
 import java.util.List;
@@ -14,4 +15,6 @@ public interface MerchService {
     Page<MerchShort> search(Pageable pageable);
 
     void deleteByListId(List<UUID> request);
+
+    MerchDetail findById(UUID merchId);
 }

@@ -10,6 +10,8 @@ import ru.demo.merch.MerchMapper;
 import ru.demo.merch.MerchRepository;
 import ru.demo.merch.MerchService;
 import ru.demo.merch.model.MerchCreate;
+import ru.demo.merch.model.MerchDetail;
+import ru.demo.merch.model.MerchException;
 import ru.demo.merch.model.MerchShort;
 
 import java.util.List;
@@ -37,5 +39,10 @@ public class MerchServiceImpl implements MerchService {
     @Override
     public void deleteByListId(List<UUID> request) {
         if (request != null && !request.isEmpty()) merchRepository.deleteAllById(request);
+    }
+
+    @Override
+    public MerchDetail findById(UUID merchId) {
+        return merchMapper.toDetail(merchRepository.findById(merchId).orElseThrow(MerchException.NotFound::new));
     }
 }
