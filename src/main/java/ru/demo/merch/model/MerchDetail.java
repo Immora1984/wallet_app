@@ -16,4 +16,5 @@ public class MerchDetail {
     private String band;
     private String color;
     private BigDecimal price;
+    private List<Compound> compound;
 }

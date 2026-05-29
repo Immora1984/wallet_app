@@ -31,4 +31,7 @@ create table app_notification(
     recipient varchar not null,
     header varchar,
     body varchar not null
-)
+);
+
+--changeset migration:202602_01_6
+alter table app_merch add column compound varchar[];
