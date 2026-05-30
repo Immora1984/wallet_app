@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.*;
 import ru.demo.merch.MerchService;
 import ru.demo.merch.model.MerchCreate;
 import ru.demo.merch.model.MerchDetail;
+import ru.demo.merch.model.MerchModify.MerchUpdate;
 import ru.demo.merch.model.MerchShort;
+import ru.demo.merch.model.MerchModify;
 import ru.demo.util.ApiOperation;
 
 import java.util.List;
@@ -52,4 +54,13 @@ public class MerchController {
             authorize = "permitAll()"
     )
     MerchDetail getById(@PathVariable UUID merchId) {return merchService.findById(merchId);}
+
+    @ApiOperation(
+            path = "/{merchId}",
+            method = RequestMethod.PUT,
+            authorize = "hasAuthority('ADMIN')"
+    )
+    void updateMerch(@PathVariable UUID merchId, @RequestBody @Valid MerchUpdate request) {
+        merchService.update(merchId, request);
+    }
 }

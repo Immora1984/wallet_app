@@ -9,10 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.demo.merch.MerchMapper;
 import ru.demo.merch.MerchRepository;
 import ru.demo.merch.MerchService;
-import ru.demo.merch.model.MerchCreate;
-import ru.demo.merch.model.MerchDetail;
-import ru.demo.merch.model.MerchException;
-import ru.demo.merch.model.MerchShort;
+import ru.demo.merch.impl.jpa.Merch_;
+import ru.demo.merch.model.*;
+import ru.demo.merch.model.MerchModify.MerchUpdate;
 
 import java.util.List;
 import java.util.UUID;
@@ -33,7 +32,8 @@ public class MerchServiceImpl implements MerchService {
 
     @Override
     public Page<MerchShort> search(Pageable pageable) {
-        return merchRepository.findAll(pageable).map(merchMapper::toShort);
+        var page = merchRepository.findAll(pageable);
+        return page.map(merchMapper::toShort);
     }
 
     @Override
@@ -44,5 +44,20 @@ public class MerchServiceImpl implements MerchService {
     @Override
     public MerchDetail findById(UUID merchId) {
         return merchMapper.toDetail(merchRepository.findById(merchId).orElseThrow(MerchException.NotFound::new));
+    }
+
+    @Override
+    public void update(UUID merchId, MerchUpdate request) {
+        merchRepository.update((rt, cu, cb) -> {
+
+            if (request.getBand() != null) cu.set(rt.get(Merch_.BAND), request.getBand());
+            if (request.getSize() != null) cu.set(rt.get(Merch_.SIZE), request.getSize());
+            if (request.getPrice() != null) cu.set(rt.get(Merch_.PRICE), request.getPrice());
+            if (request.getColor() != null) cu.set(rt.get(Merch_.COLOR), request.getColor());
+            if (request.getCompound() != null) cu.set(rt.get(Merch_.COMPOUND), request.getCompound());
+            if (request.getDescription() != null) cu.set(rt.get(Merch_.DESCRIPTION), request.getDescription());
+
+            return cb.equal(rt.get(Merch_.ID), merchId);
+        });
     }
 }
