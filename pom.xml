@@ -128,6 +128,30 @@
                     </excludes>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>${openapi.version}</version>
+                <configuration>
+                    <inputSpecRootDirectory>src/test/resources/openapi</inputSpecRootDirectory>
+                    <generateSupportingFiles>false</generateSupportingFiles>
+                    <library>spring-http-interface</library>
+                    <apiNameSuffix>Client</apiNameSuffix>
+                    <generatorName>spring</generatorName>
+                    <configOptions>
+                        <useResponseEntity>false</useResponseEntity>
+                        <openApiNullable>false</openApiNullable>
+                    </configOptions>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 

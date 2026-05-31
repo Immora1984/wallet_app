@@ -1,0 +1,113 @@
+openapi: 3.0.0
+info:
+  title: Minio Minio API
+  description: Basic object operations for Minio
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:9001
+    description: Local Minio server
+
+components:
+  schemas:
+    ObjectMeta:
+      type: object
+      properties:
+        key:
+          type: string
+        size:
+          type: integer
+        lastModified:
+          type: string
+          format: date-time
+
+  parameters:
+    BucketName:
+      in: path
+      name: bucket
+      required: true
+      schema:
+        type: string
+
+    ObjectKey:
+      in: path
+      name: key
+      required: true
+      schema:
+        type: string
+
+paths:
+  /{bucket}:
+    get:
+      summary: List Minio
+      operationId: getObjects
+      description: Get list of Minio in bucket
+      tags:
+        - Minio
+      parameters:
+        - $ref: '#/components/parameters/BucketName'
+      responses:
+        '200':
+          description: Minio list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ObjectMeta'
+
+  /{bucket}/{key}:
+    put:
+      summary: Upload object
+      description: Upload file to bucket
+      operationId: uploadObject
+      tags:
+        - Minio
+      parameters:
+        - $ref: '#/components/parameters/BucketName'
+        - $ref: '#/components/parameters/ObjectKey'
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      responses:
+        '200':
+          description: Object uploaded
+
+    get:
+      summary: Download object
+      description: Download file from bucket
+      operationId: downloadObject
+      tags:
+        - Minio
+      parameters:
+        - $ref: '#/components/parameters/BucketName'
+        - $ref: '#/components/parameters/ObjectKey'
+      responses:
+        '200':
+          description: Object content
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+
+    delete:
+      summary: Delete object
+      description: Remove object from bucket
+      operationId: removeObject
+      tags:
+        - Minio
+      parameters:
+        - $ref: '#/components/parameters/BucketName'
+        - $ref: '#/components/parameters/ObjectKey'
+      responses:
+        '204':
+          description: Object deleted
+
+tags:
+  - name: Minio
+    description: Basic object operations

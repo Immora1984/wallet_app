@@ -31,6 +31,13 @@ spring:
       private: rsa/private.pem
       public: rsa/public.pem
 
+  minio:
+    link-expires: ${MINIO_LINK_EXPIRES}
+    base-uri: ${MINIO_URI}
+    access-key: ${MINIO_ACCESS_KEY}
+    secret-key: ${MINIO_SECRET_KEY}
+    region: ${MINIO_REGION}
+
   mail:
     username: ${MAIL_USERNAME}
     password: ${MAIL_PASSWORD}
