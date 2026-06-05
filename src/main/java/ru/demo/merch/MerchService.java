@@ -2,6 +2,7 @@ package ru.demo.merch;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 import ru.demo.merch.model.MerchCreate;
 import ru.demo.merch.model.MerchDetail;
 import ru.demo.merch.model.MerchModify.MerchUpdate;

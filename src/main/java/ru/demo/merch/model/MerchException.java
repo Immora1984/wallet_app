@@ -12,4 +12,12 @@ public class MerchException extends ErrorResponseException {
     public static class NotFound extends MerchException {
         public NotFound() { super(HttpStatus.NOT_FOUND); }
     }
+
+    public static class UploadImageException extends MerchException {
+        public UploadImageException() {super(HttpStatus.BAD_REQUEST);}
+    }
+
+    public static class PhotosLimit extends MerchException {
+        public PhotosLimit() { super(HttpStatus.BAD_REQUEST); }
+    }
 }

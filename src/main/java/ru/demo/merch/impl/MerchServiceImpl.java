@@ -1,18 +1,25 @@
 package ru.demo.merch.impl;
 
+import io.minio.MinioClient;
+import io.minio.PutObjectArgs;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import ru.demo.merch.MerchMapper;
 import ru.demo.merch.MerchRepository;
 import ru.demo.merch.MerchService;
+import ru.demo.merch.impl.jpa.Merch;
 import ru.demo.merch.impl.jpa.Merch_;
 import ru.demo.merch.model.*;
 import ru.demo.merch.model.MerchModify.MerchUpdate;
 
+import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,7 +29,11 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class MerchServiceImpl implements MerchService {
 
+    @Value("${spring.minio.backet-name}")
+    private String backetName;
+
     private final MerchRepository merchRepository;
+    private final MinioClient minioClient;
     private final MerchMapper merchMapper;
 
     @Override
@@ -54,10 +65,33 @@ public class MerchServiceImpl implements MerchService {
             if (request.getSize() != null) cu.set(rt.get(Merch_.SIZE), request.getSize());
             if (request.getPrice() != null) cu.set(rt.get(Merch_.PRICE), request.getPrice());
             if (request.getColor() != null) cu.set(rt.get(Merch_.COLOR), request.getColor());
+            if (request.getPhoto() != null) cu.set(rt.get(Merch_.PHOTOS), upload(merchId, request));
             if (request.getCompound() != null) cu.set(rt.get(Merch_.COMPOUND), request.getCompound());
             if (request.getDescription() != null) cu.set(rt.get(Merch_.DESCRIPTION), request.getDescription());
 
             return cb.equal(rt.get(Merch_.ID), merchId);
         });
+    }
+
+    private List<String> upload(UUID merchId, MerchUpdate request) {
+        var files = request.getPhoto();
+        var photos = merchRepository.findById(merchId).orElseThrow(MerchException.NotFound::new).getPhotos();
+
+        if (photos.size() + files.size() > 3) throw new MerchException.PhotosLimit();
+
+
+        return files.stream().map(file -> {
+            try {
+                var key = merchId + "-" + file.getOriginalFilename();
+                minioClient.putObject(PutObjectArgs.builder()
+                        .bucket(backetName)
+                        .object(key)
+                        .stream(new ByteArrayInputStream(file.getBytes()), file.getBytes().length, -1)
+                        .build());
+                return key;
+            } catch (Exception e) {
+                throw new MerchException.UploadImageException();
+            }
+        }).toList();
     }
 }

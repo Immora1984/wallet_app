@@ -32,11 +32,16 @@ spring:
       public: rsa/public.pem
 
   minio:
+    backet-name: ${BACKET_NAME}
     link-expires: ${MINIO_LINK_EXPIRES}
     base-uri: ${MINIO_URI}
     access-key: ${MINIO_ACCESS_KEY}
     secret-key: ${MINIO_SECRET_KEY}
     region: ${MINIO_REGION}
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
 
   mail:
     username: ${MAIL_USERNAME}

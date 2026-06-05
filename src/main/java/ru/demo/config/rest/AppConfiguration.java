@@ -1,6 +1,7 @@
 package ru.demo.config.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.minio.MinioClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,7 +20,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import ru.demo.auth.AuthService;
+import ru.demo.config.minio.MinioProperties;
 
+import java.net.MalformedURLException;
 import java.util.List;
 
 @Slf4j
@@ -86,4 +89,12 @@ public class AppConfiguration implements WebMvcConfigurer {
         return new ObjectMapper();
     }
 
+    @Bean
+    MinioClient minioClient(MinioProperties prop) throws MalformedURLException {
+        return MinioClient.builder()
+                .credentials(prop.getAccessKey(), prop.getSecretKey())
+                .endpoint(prop.getBaseUri().toURL())
+                .region(prop.getRegion())
+                .build();
+    }
 }

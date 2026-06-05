@@ -11,10 +11,7 @@ import ru.demo.merch.model.Compound;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Getter
 @Setter
@@ -31,7 +28,7 @@ public class Merch {
     private LocalDateTime modified;
 
     @JdbcTypeCode(SqlTypes.ARRAY)
-    private List<String> photos;
+    private List<String> photos = new ArrayList<>(3);
 
     @JdbcTypeCode(SqlTypes.JSON)
     private List<Compound> compound;

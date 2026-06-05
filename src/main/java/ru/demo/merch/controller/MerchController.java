@@ -1,16 +1,17 @@
 package ru.demo.merch.controller;
 
 import jakarta.validation.Valid;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedModel;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import ru.demo.merch.MerchService;
 import ru.demo.merch.model.MerchCreate;
 import ru.demo.merch.model.MerchDetail;
 import ru.demo.merch.model.MerchModify.MerchUpdate;
 import ru.demo.merch.model.MerchShort;
-import ru.demo.merch.model.MerchModify;
 import ru.demo.util.ApiOperation;
 
 import java.util.List;
@@ -62,5 +63,16 @@ public class MerchController {
     )
     void updateMerch(@PathVariable UUID merchId, @RequestBody @Valid MerchUpdate request) {
         merchService.update(merchId, request);
+    }
+
+    @ApiOperation(
+            path = "/{merchId}/upload",
+            method = RequestMethod.PUT,
+            authorize = "hasAuthority('ADMIN')"
+    )
+    void uploadImage(@PathVariable UUID merchId, @RequestPart @NonNull List<MultipartFile> file) {
+        var merchUpdate = new MerchUpdate();
+        merchUpdate.setPhoto(file);
+        merchService.update(merchId, merchUpdate);
     }
 }
