@@ -22,4 +22,6 @@ public interface MerchService {
     MerchDetail findById(UUID merchId);
 
     void update(UUID merchId, MerchUpdate request);
+
+    void deletePhoto(UUID merchId, List<String> photoUrl);
 }

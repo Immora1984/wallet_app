@@ -75,4 +75,13 @@ public class MerchController {
         merchUpdate.setPhoto(file);
         merchService.update(merchId, merchUpdate);
     }
+
+    @ApiOperation(
+            method = RequestMethod.PUT,
+            path = "/{merchId}/delete",
+            authorize = "hasAuthority('ADMIN')"
+    )
+    void deletePhoto(@PathVariable UUID merchId, @RequestPart List<String> photoUrl) {
+        merchService.deletePhoto(merchId, photoUrl);
+    }
 }

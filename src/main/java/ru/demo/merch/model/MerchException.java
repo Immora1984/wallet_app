@@ -20,4 +20,8 @@ public class MerchException extends ErrorResponseException {
     public static class PhotosLimit extends MerchException {
         public PhotosLimit() { super(HttpStatus.BAD_REQUEST); }
     }
+
+    public static class RemovePhotoException extends MerchException {
+        public RemovePhotoException() { super(HttpStatus.BAD_REQUEST); }
+    }
 }

@@ -10,7 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @RequiredArgsConstructor
 public class WalletTzApplication {
 
-    static void main(String[] args) {
+    void main(String[] args) {
         SpringApplication.run(WalletTzApplication.class, args);
     }
 
