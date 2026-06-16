@@ -24,4 +24,8 @@ public class MerchException extends ErrorResponseException {
     public static class RemovePhotoException extends MerchException {
         public RemovePhotoException() { super(HttpStatus.BAD_REQUEST); }
     }
+
+    public static class IncorrectKeyUrl extends MerchException {
+        public IncorrectKeyUrl() { super(HttpStatus.BAD_REQUEST); }
+    }
 }

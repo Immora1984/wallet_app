@@ -1,13 +1,10 @@
 package ru.demo.merch.impl;
 
-import io.minio.GetPresignedObjectUrlArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
-import io.minio.http.Method;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -53,17 +50,13 @@ public class MerchServiceImpl implements MerchService {
 
                 var photoUrls = minioUtils.generatePresignedUrls(merch.getPhotos());
                 shortDto.setPhotoUrls(photoUrls);
-
-                if (!photoUrls.isEmpty()) {
-                    shortDto.setFirstPhotoUrl(photoUrls.getFirst());
-                }
             }
             return shortDto;
         });
     }
 
     @Override
-    public void deleteByListId(List<UUID> request) {
+    public void deleteById(List<UUID> request) {
         if (request != null && !request.isEmpty()) merchRepository.deleteAllById(request);
     }
 
@@ -95,27 +88,27 @@ public class MerchServiceImpl implements MerchService {
 
     @Override
     public void deletePhoto(UUID merchId, List<String> photoUrl) {
-        merchRepository.findById(merchId).ifPresent(result -> {
-            var photo = result.getPhotos();
+        merchRepository.findById(merchId).ifPresent(merch -> {
+            var photo = merch.getPhotos();
 
             var keys = photoUrl.stream().map(this::extractKeyFromUrl).toList();
             var isRemove = keys.stream().allMatch(photo::remove);
 
             if (!isRemove) throw new MerchException.RemovePhotoException();
 
-            merchRepository.save(result);
+            merchRepository.save(merch);
         });
     }
 
     private String extractKeyFromUrl(String photoUrl) {
         try {
-            var uri = new URI(photoUrl);
-            var path = uri.getPath();
+            var path = new URI(photoUrl).getPath();
             var key = path.startsWith("/") ? path.substring(1) : path;
 
             return key.substring( key.indexOf('/') + 1);
         } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
+            log.error(e.getLocalizedMessage());
+            throw new MerchException.IncorrectKeyUrl();
         }
     }
 
@@ -128,13 +121,16 @@ public class MerchServiceImpl implements MerchService {
         return files.stream().map(file -> {
             try {
                 var key = merchId + "-" + file.getOriginalFilename();
+
                 minioClient.putObject(PutObjectArgs.builder()
                         .bucket(backetName)
                         .object(key)
                         .stream(new ByteArrayInputStream(file.getBytes()), file.getBytes().length, -1)
                         .build());
+
                 return key;
             } catch (Exception e) {
+                log.error(e.getLocalizedMessage());
                 throw new MerchException.UploadImageException();
             }
         }).toList();

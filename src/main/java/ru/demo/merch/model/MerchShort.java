@@ -16,7 +16,6 @@ public class MerchShort {
     private String color;
     private BigDecimal price;
     private List<String> photoUrls;
-    private String firstPhotoUrl;
     private List<Compound> compound;
     private String description;
 }

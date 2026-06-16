@@ -47,7 +47,7 @@ public class MerchController {
             tags = "Мерч",
             authorize = "hasAuthority('ADMIN')"
     )
-    void removeMerch(@RequestParam List<UUID> ids) {merchService.deleteByListId(ids);}
+    void removeMerch(@RequestParam List<UUID> ids) {merchService.deleteById(ids);}
 
     @ApiOperation(
             path = "/{merchId}",

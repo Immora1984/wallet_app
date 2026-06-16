@@ -12,7 +12,6 @@ import java.util.UUID;
 public class MerchDetail {
     private UUID id;
     private List<String> photoUrls;
-    private String firstPhotoUrl;
     private String size;
     private String band;
     private String color;
